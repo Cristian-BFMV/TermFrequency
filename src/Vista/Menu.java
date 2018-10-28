@@ -7,9 +7,13 @@ package Vista;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import java.io.File;
+import java.io.FileReader;
+import java.io.BufferedReader;
 import Modelo.Hilera;
 import Modelo.IHilera;
 import java.util.ArrayList;
+import java.io.IOException;
 
 /**
  *
@@ -21,6 +25,10 @@ public class Menu extends javax.swing.JFrame {
      * Creates new form Menu
      */
     IHilera hilera;
+    File archivo;
+    FileReader archivoReader;
+    BufferedReader archivoBuffer;
+
     public Menu() {
         initComponents();
     }
@@ -103,18 +111,38 @@ public class Menu extends javax.swing.JFrame {
     private void btnBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowseActionPerformed
         JFileChooser jfChooser = new JFileChooser();
         int seleccion = jfChooser.showOpenDialog(null);
-        if(seleccion == JFileChooser.APPROVE_OPTION){
-            txtATexto.setText(jfChooser.getSelectedFile().getAbsolutePath());            
+        String aux, finalWord = "";
+        String palabras[];
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            archivo = new File(jfChooser.getSelectedFile().getAbsolutePath());
+            try {
+                archivoReader = new FileReader(archivo);
+                archivoBuffer = new BufferedReader(archivoReader);
+                while ((aux = archivoBuffer.readLine()) != null) {
+                    finalWord = finalWord.concat(aux);
+                }
+                palabras = finalWord.split(" ");
+                hilera = new Hilera();
+                ArrayList<String[]> resultado = hilera.countingWords(palabras);
+                for (int i = 0; i < resultado.get(0).length; i++) {
+                    if (resultado.get(0)[i] != null && resultado.get(1)[i] != null) {
+                        System.out.println("Palabra: " + resultado.get(0)[i] + ", Frecuencia: " + resultado.get(1)[i]);
+                    }
+                }
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Algo ha salido mal, lo sentimos", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }//GEN-LAST:event_btnBrowseActionPerformed
 
     private void btnFrequencyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFrequencyActionPerformed
-        String [] palabras = txtATexto.getText().replaceAll("\n", " ").split(" ");
+        String[] palabras = txtATexto.getText().replaceAll("\n", " ").split(" ");
         hilera = new Hilera();
-        ArrayList<String []> resultado = hilera.countingWords(palabras);
-        for(int i =0; i< resultado.get(0).length;i++){
-            if(resultado.get(0)[i]!=null && resultado.get(1)[i] != null)
+        ArrayList<String[]> resultado = hilera.countingWords(palabras);
+        for (int i = 0; i < resultado.get(0).length; i++) {
+            if (resultado.get(0)[i] != null && resultado.get(1)[i] != null) {
                 System.out.println("Palabra: " + resultado.get(0)[i] + ", Frecuencia: " + resultado.get(1)[i]);
+            }
         }
     }//GEN-LAST:event_btnFrequencyActionPerformed
 
